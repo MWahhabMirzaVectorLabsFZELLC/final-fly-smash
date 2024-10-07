@@ -397,10 +397,7 @@ useEffect(() => {
           {/* Points Message */}
           <PointsMessage pointsMessage={pointsMessage} />
 
-          {/* Play Again Prompt */}
-          {showPrompt && (
-            <PlayAgainPrompt resetGame={resetGame} onInvite={handleInvite} />
-          )}
+       
 
           {/* Cooldown Modal */}
           <Modal
