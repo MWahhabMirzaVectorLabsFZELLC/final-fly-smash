@@ -9,7 +9,8 @@ const PointsMessage = ({ pointsMessage }) => {
       className="text-center"
       style={{
         fontSize: "2rem",
-        color: "#4caf50",
+        fontWeight: "1000",
+        color: "#ffc00",
         position: "absolute",
         top: "50%",
         left: "50%",
