@@ -3,7 +3,7 @@ import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 
 const Fly = ({ x, y, onClick }) => {
   const playSound = () => {
-    const audio = new Audio("/src/assets/mixkit-sword-cutting-flesh-2788.wav"); // Path to your sound file
+    const audio = new Audio("https://res.cloudinary.com/dvaf37ode/video/upload/v1728130562/mixkit-sword-cutting-flesh-2788_t4ozqi.wav"); // Path to your sound file
     audio.play();
     setTimeout(() => {
       audio.pause(); // Ensure sound does not play longer than 1 second
