@@ -24,7 +24,7 @@ const TaskComponent = ({ score, setScore }) => {
       description: "Subscribe to our YouTube channel",
       reward: 20,
       completed: false,
-      action: "https://www.youtube.com/",
+      action: "https://www.youtube.com/@MWahhabMirza-VectorLabsF-eq8qc",
       type: "one-time",
     },
     {
