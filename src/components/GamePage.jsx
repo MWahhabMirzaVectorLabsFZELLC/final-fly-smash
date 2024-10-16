@@ -67,7 +67,7 @@ const GamePage = ({ setToken }) => {
 // Function to fetch score from backend
 const fetchScoreFromBackend = async () => {
   try {
-    const response = await axios.get(`http://localhost:5000/api/profile/${username}`);
+    const response = await axios.get(`https://flysmash-server.vercel.app/?vercelToolbarCode=vxGZhZ2erVHjxo7/api/profile/${username}`);
     const backendScore = response.data.score;
 
     setScore(backendScore); // Set the score from backend
