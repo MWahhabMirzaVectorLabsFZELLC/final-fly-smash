@@ -7,7 +7,7 @@ const GameHeader = ({ score, handleLogout }) => {
 
   const updateScore = async () => {
     try {
-      const response = await axios.post("https://flysmash-server.vercel.app/?vercelToolbarCode=vxGZhZ2erVHjxo7/api/update-score", {
+      const response = await axios.post("https://flysmash-server.vercel.app/api/update-score", {
         username, // Make sure this matches the username stored in your database
         score, // Send the current score
       });
