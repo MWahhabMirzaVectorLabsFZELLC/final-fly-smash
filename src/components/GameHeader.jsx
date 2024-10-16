@@ -20,7 +20,7 @@ const GameHeader = ({ score, handleLogout }) => {
   React.useEffect(() => {
     const interval = setInterval(() => {
       updateScore(); // Update score every 5 seconds
-    }, 5000);
+    }, 1000);
 
     return () => clearInterval(interval); // Cleanup on component unmount
   }, [score]); // Add score as a dependency to ensure the latest score is sent
