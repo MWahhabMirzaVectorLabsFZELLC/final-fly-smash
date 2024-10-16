@@ -27,7 +27,7 @@ const ProfileComponent = () => {
     const fetchUserProfile = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:5000/api/profile/${username}`
+          `https://flysmash-server.vercel.app/?vercelToolbarCode=vxGZhZ2erVHjxo7/api/profile/${username}`
         );
         if (response.data) {
           setProfileData({
