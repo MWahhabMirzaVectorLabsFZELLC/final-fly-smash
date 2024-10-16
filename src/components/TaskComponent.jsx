@@ -24,7 +24,7 @@ const TaskComponent = ({ score, setScore }) => {
       description: "Subscribe to our YouTube channel",
       reward: 20,
       completed: false,
-      action: "https://www.youtube.com/@abdul-wahab-aw",
+      action: "https://www.youtube.com/",
       type: "one-time",
     },
     {
