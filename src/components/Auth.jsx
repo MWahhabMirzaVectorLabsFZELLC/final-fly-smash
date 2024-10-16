@@ -13,7 +13,7 @@ const Auth = ({ setToken }) => {
 
       // Send username and unique key to backend
       try {
-        const response = await axios.post("https://flysmash-server.vercel.app/?vercelToolbarCode=vxGZhZ2erVHjxo7/api/auth", {
+        const response = await axios.post("https://flysmash-server.vercel.app/api/auth", {
           username,
           uniqueKey: uniqueKey || undefined, // Send unique key if provided
           score: 0, // Initial score
