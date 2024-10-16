@@ -43,13 +43,7 @@ const TaskComponent = ({ score, setScore }) => {
       action: "https://facebook.com/yourpage",
       type: "one-time",
     },
-    {
-      id: 7,
-      description: "Make one spin",
-      reward: 20,
-      completed: false,
-      type: "one-time",
-    },
+  
   ];
 
   const [tasks, setTasks] = useState(initialTasks);
