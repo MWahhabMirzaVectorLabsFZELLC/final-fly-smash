@@ -10,7 +10,7 @@ import Modal from "react-modal";
 import NavBar from "./navbar"; // NavBar import
 import { v4 as uuidv4 } from "uuid";
 import "../App.css";
-import CakeImages from "./CakeImages";
+// import CakeImages from "./CakeImages";
 import bg from "../assets/bg.jpeg.png";
 import sad from "../assets/sad.gif"
 import { playSound } from "../components/sound/PlaySound";
@@ -318,7 +318,7 @@ useEffect(() => {
         transition: "background-image 0.5s ease-in-out", // Add transition for the background image
       }}
     >
-      {isGameActive && <CakeImages />}
+      {isGameActive}
       {isNavbarVisible && (
         <NavBar
           score={score}
