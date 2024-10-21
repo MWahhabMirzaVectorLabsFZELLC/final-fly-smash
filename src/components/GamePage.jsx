@@ -188,11 +188,11 @@ export default function Component({ setToken }) {
     // Vibration logic based on element type
     if (navigator.vibrate) {
       if (type === "fly") {
-        navigator.vibrate(1300); // Short vibration for catching a fly
+        navigator.vibrate(1500); // Short vibration for catching a fly
       } else if (type === "bomb") {
-        navigator.vibrate(1200); // Longer pattern for bombs
+        navigator.vibrate(1500); // Longer pattern for bombs
       } else if (type === "freezer") {
-        navigator.vibrate(1110); // Continuous vibration for freezer
+        navigator.vibrate(1500); // Continuous vibration for freezer
       } else if (type === "mysteryBox") {
         navigator.vibrate([300, 100, 300]); // Distinct pattern for mystery box
       }
