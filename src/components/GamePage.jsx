@@ -185,46 +185,47 @@ export default function Component({ setToken }) {
     }
   };
   const handleClick = (index, pointValue, type) => {
-    // Vibration logic based on element type
-    if (navigator.vibrate) {
-      if (type === "fly") {
-        navigator.vibrate(1005); // Short vibration for catching a fly
-      } else if (type === "bomb") {
-        navigator.vibrate(1500); // Longer pattern for bombs
-      } else if (type === "freezer") {
-        navigator.vibrate(1500); // Continuous vibration for freezer
-      } else if (type === "mysteryBox") {
-        navigator.vibrate([300, 100, 300]); // Distinct pattern for mystery box
-      }
-    }
-  
+  const handleClick = (index, pointValue, type) => {
+  if (navigator.vibrate) {
     if (type === "fly") {
-      setScore((prevScore) => prevScore + pointValue);
-      setPointsMessage(`+${pointValue}`);
-      playSound("https://res.cloudinary.com/dvaf37ode/video/upload/v1728130562/mixkit-sword-cutting-flesh-2788_t4ozqi.wav");
+      navigator.vibrate([100, 50, 100]); // Quick double pulse
     } else if (type === "bomb") {
-      setScore((prevScore) => prevScore + 5);
-      setElements((prevElements) => prevElements.slice(0, -3));
-      setPointsMessage("+5 (Bomb)");
-      playSound("https://res.cloudinary.com/dvaf37ode/video/upload/v1728130511/mixkit-8-bit-bomb-explosion-2811_b3dvxe.wav");
+      navigator.vibrate([300, 100, 300]); // Stronger pulse for bomb
     } else if (type === "freezer") {
-      if (!paused) {
-        setPaused(true);
-        playSound("https://res.cloudinary.com/dvaf37ode/video/upload/v1728130511/mixkit-8-bit-bomb-explosion-2811_b3dvxe.wav");
-        setTimeout(() => {
-          setPaused(false);
-        }, 5000);
-      }
+      navigator.vibrate([500, 200, 500]); // Long pulse for freezer
     } else if (type === "mysteryBox") {
-      setMysteryBoxCollected(true);
-      setMysteryBoxScore(pointValue);
-      playSound("https://res.cloudinary.com/dvaf37ode/video/upload/v1728130608/mixkit-winning-a-coin-video-game-2069_sksjwk.wav");
+      navigator.vibrate([200, 50, 200, 50, 200]); // Rhythmic for mystery box
     }
-  
-    setElements((prevElements) => prevElements.filter((_, i) => i !== index));
-    setTimeout(() => setPointsMessage(""), 1000);
-  };
-  
+  }
+
+  // Handle scoring and sound logic
+  if (type === "fly") {
+    setScore((prevScore) => prevScore + pointValue);
+    setPointsMessage(`+${pointValue}`);
+    playSound("https://res.cloudinary.com/dvaf37ode/video/upload/v1728130562/mixkit-sword-cutting-flesh-2788_t4ozqi.wav");
+  } else if (type === "bomb") {
+    setScore((prevScore) => prevScore + 5);
+    setElements((prevElements) => prevElements.slice(0, -3));
+    setPointsMessage("+5 (Bomb)");
+    playSound("https://res.cloudinary.com/dvaf37ode/video/upload/v1728130511/mixkit-8-bit-bomb-explosion-2811_b3dvxe.wav");
+  } else if (type === "freezer") {
+    if (!paused) {
+      setPaused(true);
+     // playSound("https://res.cloudinary.com/dvaf37ode/video/upload/v1728130511/mixkit-8-bit-bomb-explosion-2811_b3dvxe.wav");
+      setTimeout(() => {
+        setPaused(false);
+      }, 5000);
+    }
+  } else if (type === "mysteryBox") {
+    setMysteryBoxCollected(true);
+    setMysteryBoxScore(pointValue);
+   // playSound("https://res.cloudinary.com/dvaf37ode/video/upload/v1728130608/mixkit-winning-a-coin-video-game-2069_sksjwk.wav");
+  }
+
+  setElements((prevElements) => prevElements.filter((_, i) => i !== index));
+  setTimeout(() => setPointsMessage(""), 1000);
+};
+
 
   const resetGame = () => {
     setIsGameActive(true);
