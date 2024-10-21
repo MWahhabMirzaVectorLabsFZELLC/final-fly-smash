@@ -1,23 +1,22 @@
 import React, { useState, useEffect } from "react";
 import GameHeader from "./GameHeader";
-import Apple from "./Ant"; // This could be changed to Fly if you're working with Fly component
 import Bomb from "./Bomb";
+import Freezer from "./Freezer";
+import Ant from "./Ant";  // We'll use this as "fly"
+import MysteryBox from "./MysteryBox";  // New component for mystery box
 import axios from 'axios';
 import PointsMessage from "./PointsMessage";
-// import PlayAgainPrompt from "./PlayAgainPrompt";
 import CooldownTimer from "./CooldownTimer";
 import Modal from "react-modal";
-import NavBar from "./navbar"; // NavBar import
+import NavBar from "./navbar";
 import { v4 as uuidv4 } from "uuid";
 import "../App.css";
-// import CakeImages from "./CakeImages";
 import bg from "../assets/bg.jpeg.png";
-import sad from "../assets/sad.gif"
+import sad from "../assets/sad.gif";
 import { playSound } from "../components/sound/PlaySound";
-import { generateElements } from "../components/Elements/GenerateElements";
 
-const GamePage = ({ setToken }) => {
-  const [backgroundImage, setBackgroundImage] = useState(""); // Add this state
+export default function Component({ setToken }) {
+  const [backgroundImage, setBackgroundImage] = useState("");
   const [score, setScore] = useState(0);
   const [rank, setRank] = useState(8);
   const [elements, setElements] = useState([]);
@@ -28,116 +27,99 @@ const GamePage = ({ setToken }) => {
   const [gameStarted, setGameStarted] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [cooldownStart, setCooldownStart] = useState(0);
-  const [paused, setPaused] = useState(false); // Track if the game is paused
-  const [gameOver, setGameOver] = useState(false); // Track game over status
-  const username = localStorage.getItem("username");
-  const [flySpeed, setFlySpeed] = useState(60); // Initial speed of fly element
-  const [flyFrequency, setFlyFrequency] = useState(700); // Frequency in ms for fly generation
+  const [paused, setPaused] = useState(false);
+  const [gameOver, setGameOver] = useState(false);
+  const [flySpeed, setFlySpeed] = useState(10);
+  const [flyFrequency, setFlyFrequency] = useState(1700);
   const [isNavbarVisible, setIsNavbarVisible] = useState(true);
-  // // Function to play sound
-  // const playSound = (url) => {
-  //   const audio = new Audio(url);
-  //   audio.play().catch((error) => {
-  //     console.error("Error playing sound:", error);
-  //   });
-  // };
+  const [mysteryBoxCollected, setMysteryBoxCollected] = useState(false);
+  const [mysteryBoxScore, setMysteryBoxScore] = useState(0);
+
+  const username = localStorage.getItem("username");
 
   let backgroundMusic = null;
-  // Function to play background music at low volume
+
   const playBackgroundMusic = (url) => {
     if (!backgroundMusic) {
       backgroundMusic = new Audio(url);
-      backgroundMusic.volume = 0.1; // Set to low volume
-      backgroundMusic.loop = true;  // Loop the music
+      backgroundMusic.volume = 0.1;
+      backgroundMusic.loop = true;
       backgroundMusic.play().catch((error) => {
         console.error("Error playing background music:", error);
       });
     }
   };
 
-  // Function to stop background music
   const stopBackgroundMusic = () => {
     if (backgroundMusic) {
       backgroundMusic.pause();
-      backgroundMusic.currentTime = 0; // Reset the audio
-      backgroundMusic = null;  // Clear reference
+      backgroundMusic.currentTime = 0;
+      backgroundMusic = null;
     }
   };
 
-// Function to fetch score from backend
-const fetchScoreFromBackend = async () => {
-  try {
-    const response = await axios.get(`https://flysmash-server.vercel.app/api/profile/${username}`);
-    const backendScore = response.data.score;
-
-    setScore(backendScore); // Set the score from backend
-    localStorage.setItem("score", backendScore); // Update localStorage with backend score
-    console.log("Fetched score from backend:", backendScore);
-  } catch (error) {
-    if (error.response && error.response.data) {
-      console.error("Error fetching score from backend:", error.response.data);
-    } else {
-      console.error("Error fetching score from backend:", error.message || error);
-    }
-  }
-};
-
-// Load scores and games played from localStorage on initial render
-useEffect(() => {
-  const storedScore = Number(localStorage.getItem("score")) || 0;
-  const storedGamesPlayed = Number(localStorage.getItem("gamesPlayed")) || 0;
-
-  // Fetch score from backend every time the window is loaded
-  window.onload = () => {
-    if (username) {
-      fetchScoreFromBackend();
+  const fetchScoreFromBackend = async () => {
+    try {
+      const response = await axios.get(`https://flysmash-server.vercel.app/api/profile/${username}`);
+      const backendScore = response.data.score;
+      setScore(backendScore);
+      localStorage.setItem("score", backendScore.toString());
+      console.log("Fetched score from backend:", backendScore);
+    } catch (error) {
+      console.error("Error fetching score from backend:", error.response?.data || error.message || error);
     }
   };
 
-  setScore(storedScore);
-  setGamesPlayed(storedGamesPlayed);
+  useEffect(() => {
+    const storedScore = Number(localStorage.getItem("score")) || 0;
+    const storedGamesPlayed = Number(localStorage.getItem("gamesPlayed")) || 0;
 
-  // Cleanup the window.onload event listener when the component unmounts
-  return () => {
-    window.onload = null;
-  };
-}, [username]);
+    window.onload = () => {
+      if (username) {
+        fetchScoreFromBackend();
+      }
+    };
 
+    setScore(storedScore);
+    setGamesPlayed(storedGamesPlayed);
 
-  // Handle game timing and element generation
+    return () => {
+      window.onload = null;
+    };
+  }, [username]);
+
   useEffect(() => {
     if (isGameActive && !paused && !gameOver) {
-      // Generate elements at a dynamic frequency based on flyFrequency
       const elementInterval = setInterval(() => {
         generateElements();
       }, flyFrequency);
 
-      // Move elements and check if any apple reaches the bottom of the screen
       const movementInterval = setInterval(() => {
         setElements((prevElements) =>
           prevElements
             .map((element) => {
               const newY = parseFloat(element.y) + 1;
 
-              // Check if an apple reaches the bottom (100vh)
-              if (newY > 100 && element.type === "apple") {
-                overGame(); // Trigger custom game over
-                return null; // Remove the element
+              if (newY > 100) {
+                if (element.type === "fly") {
+                  endGame();
+                }
+                return null;
               }
 
               return { ...element, y: `${newY}vh` };
             })
-            .filter(Boolean) // Filter out any null elements
+            .filter(Boolean)
         );
-      }, 1000);
+      }, 50);
 
-      // Cleanup both intervals on component unmount or on re-render
       return () => {
         clearInterval(elementInterval);
         clearInterval(movementInterval);
       };
     }
   }, [isGameActive, flyFrequency, paused, gameOver]);
+
   const generateElements = () => {
     const elementType = Math.random();
     const startY = -5;
@@ -147,21 +129,24 @@ useEffect(() => {
 
     const mediumSize = 2;
     const flySize = 1;
+    const freezerSize = 2;
+    const mysteryBoxSize = 3;
 
-    if (elementType < 0.9) {
-      const randomSize = Math.floor(Math.random() * 3) + 1;
+    if (elementType < 0.80) {
       setElements((prevElements) => [
         ...prevElements,
         {
           id: uuidv4(),
           x: `${randomX}vw`,
           y: `${startY}vh`,
-          pointValue: randomSize,
-          size: randomSize,
-          type: "apple",
+          pointValue: 1,
+          size: flySize,
+          type: "fly",
         },
       ]);
-    } else if (elementType < 0.97) {
+      setFlySpeed((prevSpeed) => Math.max(prevSpeed + 1, 100));
+      setFlyFrequency((prevFrequency) => Math.max(prevFrequency - 10, 200));
+    } else if (elementType < 0.90) {
       setElements((prevElements) => [
         ...prevElements,
         {
@@ -173,7 +158,7 @@ useEffect(() => {
           type: "bomb",
         },
       ]);
-    } else {
+    } else if (elementType < 0.95) {
       setElements((prevElements) => [
         ...prevElements,
         {
@@ -181,74 +166,91 @@ useEffect(() => {
           x: `${randomX}vw`,
           y: `${startY}vh`,
           pointValue: 0,
-          size: flySize,
-          type: "fly",
+          size: freezerSize,
+          type: "freezer",
         },
       ]);
-      // Increase fly generation frequency and speed as more flies are generated
-      setFlySpeed((prevSpeed) => Math.max(prevSpeed + 2, 100));
-      setFlyFrequency((prevFrequency) => Math.max(prevFrequency - 100, 200));
+    } else if (!mysteryBoxCollected && score === 20) {
+      setElements((prevElements) => [
+        ...prevElements,
+        {
+          id: uuidv4(),
+          x: `${randomX}vw`,
+          y: `${startY}vh`,
+          pointValue: Math.floor(Math.random() * (10000 - 100 + 1)) + 100,
+          size: mysteryBoxSize,
+          type: "mysteryBox",
+        },
+      ]);
     }
   };
   const handleClick = (index, pointValue, type) => {
-    if (type === "apple") {
+    // Vibration logic based on element type
+    if (navigator.vibrate) {
+      if (type === "fly") {
+        navigator.vibrate(50); // Short vibration for catching a fly
+      } else if (type === "bomb") {
+        navigator.vibrate([100, 50, 100]); // Longer pattern for bombs
+      } else if (type === "freezer") {
+        navigator.vibrate(200); // Continuous vibration for freezer
+      } else if (type === "mysteryBox") {
+        navigator.vibrate([300, 100, 300]); // Distinct pattern for mystery box
+      }
+    }
+  
+    if (type === "fly") {
       setScore((prevScore) => prevScore + pointValue);
       setPointsMessage(`+${pointValue}`);
       playSound("https://res.cloudinary.com/dvaf37ode/video/upload/v1728130562/mixkit-sword-cutting-flesh-2788_t4ozqi.wav");
-    } else if (type === "bomb") {  // Corrected this part
+    } else if (type === "bomb") {
       setScore((prevScore) => prevScore + 5);
-      setElements((prevElements) => prevElements.slice(0, -3)); // Remove last 3 elements
+      setElements((prevElements) => prevElements.slice(0, -3));
       setPointsMessage("+5 (Bomb)");
       playSound("https://res.cloudinary.com/dvaf37ode/video/upload/v1728130511/mixkit-8-bit-bomb-explosion-2811_b3dvxe.wav");
+    } else if (type === "freezer") {
+      if (!paused) {
+        setPaused(true);
+        playSound("https://res.cloudinary.com/dvaf37ode/video/upload/v1728130511/mixkit-8-bit-bomb-explosion-2811_b3dvxe.wav");
+        setTimeout(() => {
+          setPaused(false);
+        }, 5000);
+      }
+    } else if (type === "mysteryBox") {
+      setMysteryBoxCollected(true);
+      setMysteryBoxScore(pointValue);
+      playSound("https://res.cloudinary.com/dvaf37ode/video/upload/v1728130608/mixkit-winning-a-coin-video-game-2069_sksjwk.wav");
     }
-
-    // Remove the clicked element
+  
     setElements((prevElements) => prevElements.filter((_, i) => i !== index));
-    setTimeout(() => setPointsMessage(""), 1000); // Clear the message after 1 second
+    setTimeout(() => setPointsMessage(""), 1000);
   };
-  // Handle element falling speed
-  useEffect(() => {
-    if (isGameActive && !paused && !gameOver) {
-      const fallInterval = setInterval(() => {
-        setElements((prevElements) =>
-          prevElements
-            .map((element) => {
-              const newY = parseFloat(element.y) + 1;
-              if (newY > 100 && element.type === "fly") {
-                endGame(); // End game when the fly reaches the bottom
-                return null;
-              }
-              return { ...element, y: `${newY}vh` };
-            })
-            .filter(Boolean)
-        );
-      }, 50); // 50ms for smoother animation
-
-      return () => clearInterval(fallInterval);
-    }
-  }, [isGameActive, paused, gameOver]);
+  
 
   const resetGame = () => {
-    setIsGameActive(true); // Start a new game
-    // setTimeLeft(30); // Reset timer
-    setScore(score); // Reset score
-    setElements([]); // Clear all elements
-    setGameOver(false); // Reset game over state
-    setIsModalOpen(false); // Close the modal
+    setIsGameActive(true);
+    setScore(score);
+    setElements([]);
+    setGameOver(false);
+    setIsModalOpen(false);
+    setMysteryBoxCollected(false);
+    setMysteryBoxScore(0);
   };
 
-
   const endGame = () => {
-    stopBackgroundMusic();  // Stop background music when game ends
-    playSound("https://res.cloudinary.com/dvaf37ode/video/upload/v1728130657/mixkit-wrong-answer-fail-notification-946_lggn8b.wav"); // Play end game sound
+    stopBackgroundMusic();
+    playSound("https://res.cloudinary.com/dvaf37ode/video/upload/v1728130657/mixkit-wrong-answer-fail-notification-946_lggn8b.wav");
     setIsGameActive(false);
     setGameOver(true);
-    localStorage.setItem("score", score);
-    localStorage.setItem("gamesPlayed", gamesPlayed + 1);
-    setElements([]);
+
+    const newScore = score + mysteryBoxScore;
+    setScore(newScore);
+    localStorage.setItem("score", newScore.toString());
 
     const newGamesPlayed = gamesPlayed + 1;
     setGamesPlayed(newGamesPlayed);
+    localStorage.setItem("gamesPlayed", newGamesPlayed.toString());
+
+    setElements([]);
 
     if (newGamesPlayed >= 5) {
       setIsModalOpen(true);
@@ -260,24 +262,20 @@ useEffect(() => {
 
   const handleStartGame = () => {
     setBackgroundImage(`url(${bg})`);
-    playSound("https://res.cloudinary.com/dvaf37ode/video/upload/v1728130608/mixkit-winning-a-coin-video-game-2069_sksjwk.wav"); // Play start game sound
-    // playBackgroundMusic("/public/8-bit-retro-game-music-233964.mp3"); // Start background music
-    playBackgroundMusic("https://res.cloudinary.com/dvaf37ode/video/upload/v1728130397/8-bit-retro-game-music-233964_tygt63.mp3"); // Start background music
+    playSound("https://res.cloudinary.com/dvaf37ode/video/upload/v1728130608/mixkit-winning-a-coin-video-game-2069_sksjwk.wav");
+    playBackgroundMusic("https://res.cloudinary.com/dvaf37ode/video/upload/v1728130397/8-bit-retro-game-music-233964_tygt63.mp3");
     setGameStarted(true);
     setIsGameActive(true);
     setIsNavbarVisible(false);
   };
 
-
-
   const handlePauseGame = () => {
-    setPaused(true); // Pause the game
-    stopBackgroundMusic(); // Stop background music on pause
+    setPaused(true);
+    stopBackgroundMusic();
   };
 
   const handleResumeGame = () => {
-    setPaused(false); // Resume the game immediately
-
+    setPaused(false);
   };
 
   const handleCooldownEnd = () => {
@@ -291,21 +289,12 @@ useEffect(() => {
     setToken(null);
   };
 
-  const overGame = () => {
-    playSound("https://res.cloudinary.com/dvaf37ode/video/upload/v1728130657/mixkit-wrong-answer-fail-notification-946_lggn8b.wav"); // Play sound when the game ends
-    setIsGameActive(false); // Stop the game
-    setGameOver(true); // Set game over state
-    setIsModalOpen(true); // Show the game over modal
-    setElements([]); // Clear elements
-  };
-
   const handleInvite = () => {
-    const uniqueToken = uuidv4(); // Generate a unique token
-    const inviteLink = `${window.location.origin}/game?inviteToken=${uniqueToken}`; // Construct the invite link
-
-    // Show the invite link in a prompt or modal
+    const uniqueToken = uuidv4();
+    const inviteLink = `${window.location.origin}/game?inviteToken=${uniqueToken}`;
     alert(`Share this link with your friends: ${inviteLink}`);
   };
+
   return (
     <div
       className="game-container position-relative"
@@ -313,25 +302,23 @@ useEffect(() => {
         width: "100vw",
         height: "100vh",
         overflow: "hidden",
-        backgroundImage: backgroundImage, // Set the background image
-        backgroundSize: "cover", // Optional: cover the entire area
-        transition: "background-image 0.5s ease-in-out", // Add transition for the background image
+        backgroundImage: backgroundImage,
+        backgroundSize: "cover",
+        transition: "background-image 0.5s ease-in-out",
       }}
     >
-      {isGameActive}
       {isNavbarVisible && (
         <NavBar
           score={score}
           setScore={setScore}
           rank={rank}
-          stopGame={handlePauseGame} // Stop the game on NavBar interaction
-          startGame={handleResumeGame} // Resume the game
-          isGameActive={isGameActive} // Track if game is active
+          stopGame={handlePauseGame}
+          startGame={handleResumeGame}
+          isGameActive={isGameActive}
         />
       )}
       <GameHeader
         score={score}
-        // timeLeft={timeLeft}
         handleLogout={handleLogout}
       />
 
@@ -352,60 +339,72 @@ useEffect(() => {
       ) : (
         <>
           {elements.map((element, index) => {
-            if (element.type === "apple") {
+            if (element.type === "fly") {
               return (
-                <Apple
-                  key={index}
+                <Ant
+                  key={element.id}
                   x={element.x}
                   y={element.y}
                   size={element.size}
-                  onClick={() =>
-                    handleClick(index, element.pointValue, element.type)
-                  }
-                  playSound={playSound} // Pass playSound to Apple
+                  onClick={() => handleClick(index, element.pointValue, element.type)}
+                  playSound={playSound}
                 />
               );
             } else if (element.type === "bomb") {
               return (
                 <Bomb
-                  key={index}
+                  key={element.id}
                   x={element.x}
                   y={element.y}
                   size={element.size}
-                  onClick={() =>
-                    handleClick(index, element.pointValue, element.type)
-                  }
-                  playSound={playSound} // Pass playSound to Bomb
+                  onClick={() => handleClick(index, element.pointValue, element.type)}
+                  playSound={playSound}
+                />
+              );
+            } else if (element.type === "freezer") {
+              return (
+                <Freezer
+                  key={element.id}
+                  x={element.x}
+                  y={element.y}
+                  size={element.size}
+                  onClick={() => handleClick(index, element.pointValue, element.type)}
+                />
+              );
+            } else if (element.type === "mysteryBox") {
+              return (
+                <MysteryBox
+                  key={element.id}
+                  x={element.x}
+                  y={element.y}
+                  size={element.size}
+                  onClick={() => handleClick(index, element.pointValue, element.type)}
                 />
               );
             }
-
+            return null;
           })}
 
-
-          {/* Game Over Modal */}
           {gameOver && (
             <Modal isOpen={isModalOpen} className="game-over-modal">
-              <h2>Game Over <span><img src={sad} alt="" style={{ height: "30px", marginTop: "-8px" }} /></span> </h2>
-
+              <h2>Game Over <span><img src={sad} alt="" style={{ height: "30px", marginTop: "-8px" }} /></span></h2>
+              {mysteryBoxCollected && (
+                <p>Mystery Box Bonus: +{mysteryBoxScore} points!</p>
+              )}
+              <p>Final Score: {score}</p>
               <button onClick={resetGame}>Play Again</button>
               <button onClick={() => window.location.reload()}>Home</button>
-
             </Modal>
           )}
 
-          {/* Points Message */}
           <PointsMessage pointsMessage={pointsMessage} />
 
-       
-
-          {/* Cooldown Modal */}
           <Modal
-            isOpen={isModalOpen && !gameOver} // Ensure this modal doesn't show if game is over
+            isOpen={isModalOpen && !gameOver}
             onRequestClose={() => setIsModalOpen(false)}
             style={{
               overlay: {
-                backgroundColor: "rgba(0, 0, 0, 0.6)", // Background blur
+                backgroundColor: "rgba(0, 0, 0, 0.6)",
               },
               content: {
                 padding: "0",
@@ -428,6 +427,4 @@ useEffect(() => {
       )}
     </div>
   );
-};
-
-export default GamePage;
+}
