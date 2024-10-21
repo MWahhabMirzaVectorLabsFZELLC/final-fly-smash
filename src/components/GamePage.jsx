@@ -354,7 +354,7 @@ export default function Component({ setToken }) {
                     paused
                       ? null
                       : () =>
-                          handleClick(index, element.pointValue, element.type)
+                          handleClick(index, element.pointValue, element.type)}
                   playSound={playSound}
                 />
               );
