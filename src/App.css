@@ -198,3 +198,48 @@ body {
   margin-bottom: 20px;
   color: #333; /* Darker text */
 }
+
+
+
+.popup {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(255, 255, 255, 0.9);
+  padding: 20px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+  z-index: 2000; /* Make sure it's above everything else */
+  border-radius: 5px;
+}
+
+.popup p {
+  margin: 0;
+  font-size: 18px;
+  text-align: center;
+}
+
+
+
+.icon-container {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: flex;
+  flex-direction: column; /* Stack icons vertically */
+  z-index: 1000; /* Ensure icons are above other elements */
+}
+
+.icon-container div {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.5); /* Optional: background for better visibility */
+  border-radius: 5px; /* Rounded corners */
+  padding: 5px; /* Padding around icons */
+  transition: background 0.3s;
+}
+
+.icon-container div:hover {
+  background: rgba(255, 255, 255, 0.3); /* Change background on hover */
+}
