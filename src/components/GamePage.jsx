@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { FaPause} from "react-icons/fa";
 import GameHeader from "./GameHeader";
 import Bomb from "./Bomb";
 import Freezer from "./Freezer";
@@ -34,6 +35,7 @@ export default function Component({ setToken }) {
   const [isNavbarVisible, setIsNavbarVisible] = useState(true);
   const [mysteryBoxCollected, setMysteryBoxCollected] = useState(false);
   const [mysteryBoxScore, setMysteryBoxScore] = useState(0);
+   const [showPopup, setShowPopup] = useState(false);
 
   const username = localStorage.getItem("username");
 
@@ -272,11 +274,12 @@ export default function Component({ setToken }) {
 
   const handlePauseGame = () => {
     setPaused(true);
-    stopBackgroundMusic();
+    setShowPopup(true);
   };
 
   const handleResumeGame = () => {
     setPaused(false);
+    setShowPopup(false);
   };
 
   const handleCooldownEnd = () => {
@@ -347,7 +350,11 @@ export default function Component({ setToken }) {
                   x={element.x}
                   y={element.y}
                   size={element.size}
-                  onClick={() => handleClick(index, element.pointValue, element.type)}
+                 onClick={
+                    paused
+                      ? null
+                      : () =>
+                          handleClick(index, element.pointValue, element.type)
                   playSound={playSound}
                 />
               );
@@ -385,6 +392,27 @@ export default function Component({ setToken }) {
             }
             return null;
           })}
+
+           <div className="icon-container">
+            {!gameOver && (
+              <div
+                onClick={handlePauseGame}
+                style={{ cursor: "pointer", margin: "10px" }}
+              >
+                <FaPause size={30} color="white" />
+              </div>
+            )}
+            {/* Resume button is not shown here since it's in the popup */}
+          </div>
+
+          {showPopup && (
+            <div className="popup">
+              <p>Game is paused</p>
+              <button onClick={handleResumeGame} style={{ marginTop: "20px" }}>
+                <i className="fa fa-play" aria-hidden="true"></i> Resume
+              </button>
+            </div>
+          )}
 
           {gameOver && (
             <Modal isOpen={isModalOpen} className="game-over-modal">
