@@ -184,7 +184,7 @@ export default function Component({ setToken }) {
       ]);
     }
   };
-  const handleClick = (index, pointValue, type) => {
+ 
   const handleClick = (index, pointValue, type) => {
   if (navigator.vibrate) {
     if (type === "fly") {
