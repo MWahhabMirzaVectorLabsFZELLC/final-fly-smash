@@ -188,7 +188,7 @@ export default function Component({ setToken }) {
   const handleClick = (index, pointValue, type) => {
   if (navigator.vibrate) {
     if (type === "fly") {
-      navigator.vibrate([1005, 500, 1005]); // Quick double pulse
+      navigator.vibrate([1005, 500, 105]); // Quick double pulse
     } else if (type === "bomb") {
       navigator.vibrate([1300, 100, 300]); // Stronger pulse for bomb
     } else if (type === "freezer") {
