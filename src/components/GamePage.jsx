@@ -29,6 +29,7 @@ export default function Component({ setToken }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [cooldownStart, setCooldownStart] = useState(0);
   const [paused, setPaused] = useState(false);
+ const [paused1, setPaused1] = useState(false);
   const [gameOver, setGameOver] = useState(false);
   const [flySpeed, setFlySpeed] = useState(10);
   const [flyFrequency, setFlyFrequency] = useState(1700);
@@ -211,11 +212,11 @@ export default function Component({ setToken }) {
     setPointsMessage("+5 (Bomb)");
     playSound("https://res.cloudinary.com/dvaf37ode/video/upload/v1728130511/mixkit-8-bit-bomb-explosion-2811_b3dvxe.wav");
   } else if (type === "freezer") {
-    if (!paused) {
-      setPaused(true);
+    if (!paused1) {
+      setPaused1(true);
      // playSound("https://res.cloudinary.com/dvaf37ode/video/upload/v1728130511/mixkit-8-bit-bomb-explosion-2811_b3dvxe.wav");
       setTimeout(() => {
-        setPaused(false);
+        setPaused1(false);
       }, 5000);
     }
   } else if (type === "mysteryBox") {
