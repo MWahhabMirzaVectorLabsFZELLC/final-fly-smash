@@ -243,18 +243,21 @@ export default function Component({ setToken }) {
 
   const handleClick = (index, pointValue, type) => {
     if (paused && type !== "freezer") return;
-    if (navigator.vibrate) {
+      const vibrate = navigator.vibrate || navigator.mozVibrate || navigator.msVibrate;
+  
+    if (vibrate) {
       if (type === "fly") {
-        navigator.vibrate([1005, 500, 105]); // Quick double pulse
+        vibrate([100, 500, 105]); // Quick double pulse for fly
       } else if (type === "bomb") {
-        navigator.vibrate([1300, 100, 300]); // Stronger pulse for bomb
+        vibrate([300, 100, 300]); // Stronger pulse for bomb
       } else if (type === "freezer") {
-        navigator.vibrate([1100, 200, 500]); // Long pulse for freezer
+        vibrate([500, 200, 500]); // Long pulse for freezer
       } else if (type === "mysteryBox") {
-        navigator.vibrate([200, 50, 200, 50, 200]); // Rhythmic for mystery box
+        vibrate([200, 50, 200, 50, 200]); // Rhythmic for mystery box
+      } else {
+        vibrate(250); // Default 250ms vibration for any other element interaction
       }
     }
-
     // Handle scoring and sound logic
     if (type === "fly") {
       setScore((prevScore) => prevScore + pointValue);
