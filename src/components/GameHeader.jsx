@@ -32,7 +32,8 @@ const GameHeader = ({ score, handleLogout, lives = 3, showgift }) => {
     }
   }, [score]); // Run only when `score` changes
 
-  const validLives = Math.max(0, parseInt(lives) || 0);
+  // Ensure `validLives` is a non-negative integer
+  const validLives = Number.isInteger(lives) && lives > 0 ? lives : 0;
 
   return (
     <div className="game-header d-flex justify-content-between align-items-center p-3 bg-none text-white">
@@ -41,6 +42,7 @@ const GameHeader = ({ score, handleLogout, lives = 3, showgift }) => {
       </div>
       <GiftBox />
       <div className="lives-left-display">
+        {/* Create hearts based on validLives */}
         {[...Array(validLives)].map((_, i) => (
           <img key={i} src={heart} className="lives-img" alt="heart" />
         ))}
