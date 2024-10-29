@@ -1,37 +1,38 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef } from "react";
 import axios from "axios";
 import "../App.css";
 import GiftBox from "./GiftBox";
 import scoreicon from "../assets/Scoreicon.png";
 import heart from "../assets/heart.png";
 
-const GameHeader = ({ score, handleLogout, lives, showgift }) => {
-  // const [lives, setLives] = useState(3);
-
+const GameHeader = ({ score, handleLogout, lives = 3, showgift }) => {
   const username = localStorage.getItem("username");
+  const previousScoreRef = useRef(score); // Track previous score to detect changes
 
   const updateScore = async () => {
     try {
       const response = await axios.post(
         "https://flysmash-server.vercel.app/api/update-score",
         {
-          username, // Make sure this matches the username stored in your database
-          score, // Send the current score
+          username,
+          score,
         }
       );
       console.log("Score updated successfully:", response.data);
     } catch (error) {
-      console.error("Error updating score in backend:", error.response.data);
+      console.error("Error updating score in backend:", error.response?.data || error.message);
     }
   };
 
-  React.useEffect(() => {
-    const interval = setInterval(() => {
-      updateScore(); // Update score every 5 seconds
-    }, 1000);
+  useEffect(() => {
+    // Only update if score has changed
+    if (score !== previousScoreRef.current) {
+      updateScore();
+      previousScoreRef.current = score;
+    }
+  }, [score]); // Run only when `score` changes
 
-    return () => clearInterval(interval); // Cleanup on component unmount
-  }, [score]); // Add score as a dependency to ensure the latest score is sent
+  const validLives = Math.max(0, parseInt(lives) || 0);
 
   return (
     <div className="game-header d-flex justify-content-between align-items-center p-3 bg-none text-white">
@@ -40,12 +41,9 @@ const GameHeader = ({ score, handleLogout, lives, showgift }) => {
       </div>
       <GiftBox />
       <div className="lives-left-display">
-        {[...Array(lives)].map((_, i) => (
+        {[...Array(validLives)].map((_, i) => (
           <img key={i} src={heart} className="lives-img" alt="heart" />
         ))}
-        {/* <img src={heart}  className="lives-img" alt="heart" />
-       <img src={heart} className="lives-img"  alt="heart" />
-       <img src={heart} className="lives-img"  alt="heart" /> */}
       </div>
     </div>
   );
