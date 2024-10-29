@@ -152,7 +152,7 @@ const GameButtons = ({
         button {
           cursor: pointer;
           background: transparent;
-          broder: none
+          border: none
           position: relative;
           margin-bottom: 1rem;
         }
