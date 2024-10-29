@@ -27,69 +27,6 @@ body {
   height: 41px;
 }
 
-/* Button Styles */
-.start-btn {
-  --primary: 0, 191, 255; 
-  --secondary: 135, 206, 250; 
-  --sea-green: 46, 139, 87; 
-  --light-green: 144, 238, 144; 
-  --cloud: 255, 255, 255;
-  
-  width: 70px;
-  height: 60px;
-  top: 10%;
-  border: none;
-  outline: none;
-  cursor: pointer;
-  user-select: none;
-  touch-action: manipulation;
-  outline: 10px solid rgba(var(--light-green), 0.5);
-  border-radius: 100%;
-  position: relative;
-  transition: .3s;
-  background: linear-gradient(180deg, rgba(var(--cloud), 0.8) 0%, rgba(var(--light-green), 0.7) 50%, rgba(var(--sea-green), 0.9) 100%); 
-}
-
-.start-btn .back {
-  background: rgb(var(--sea-green));
-  border-radius: 100%;
-  position: absolute;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-}
-
-.start-btn .front {
-  background: linear-gradient(0deg, rgba(var(--light-green), 0.6) 20%, rgba(var(--light-green)) 50%);
-  box-shadow: 0 .5em 1em -0.2em rgba(var(--sea-green), 0.5);
-  border-radius: 100%;
-  position: absolute;
-  border: 1px solid rgb(var(--sea-green));
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-size: 1.2rem;
-  font-weight: 600;
-  transform: translateY(-15%);
-  transition: .15s;
-  color: rgb(var(--sea-green));
-}
-
-.start-btn:active .front {
-  transform: translateY(0%);
-  box-shadow: 0 0;
-  background: green; /* Change background to green when clicked */
-  color: white; /* Change text color to white for better contrast */
-}
-
-.start-btn:hover {
-  color: rgb(var(--secondary)); /* Keep text color as secondary on hover */
-}
 
 /* Game Over Modal */
 .game-over-modal {
